@@ -158,6 +158,4 @@ Default example credentials from the env template:
 - Backend access is enforced with JWT auth middleware and role checks
 - Frontend access is enforced with protected React Router routes and Redux session restore
 
-## Development thread link
 
-This local Codex environment does not expose a shareable conversation or thread URL, so no public thread link was available to include during development.
