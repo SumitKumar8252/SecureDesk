@@ -12,15 +12,31 @@ const app = express();
 const defaultOrigins = [
   "http://localhost:5173",
 ];
-const allowedOrigins = (process.env.FRONTEND_URL || defaultOrigins.join(","))
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+
+const parseOriginList = (value) =>
+  (value || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const wildcardToRegExp = (pattern) =>
+  new RegExp(
+    `^${pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`
+  );
+
+const allowedOrigins = parseOriginList(process.env.FRONTEND_URL || defaultOrigins.join(","));
+const allowedOriginPatterns = parseOriginList(process.env.FRONTEND_URL_PATTERNS).map(
+  wildcardToRegExp
+);
+
+const isOriginAllowed = (origin) =>
+  allowedOrigins.includes(origin) ||
+  allowedOriginPatterns.some((pattern) => pattern.test(origin));
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || isOriginAllowed(origin)) {
         callback(null, true);
         return;
       }

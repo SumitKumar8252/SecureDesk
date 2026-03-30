@@ -23,6 +23,7 @@ SecureDesk is a role-based dashboard application with a separate Express MVC bac
 - Frontend route protection with React Router guards
 - API protection with backend JWT and RBAC middleware
 - Search and pagination for listings
+- Deployment-ready setup for Vercel frontend and Render backend
 
 ## Roles and permissions
 
@@ -66,7 +67,9 @@ SecureDesk/
 │   │   ├── styles/
 │   │   └── utils/
 │   ├── index.html
+│   ├── vercel.json
 │   └── vite.config.mjs
+├── render.yaml
 └── README.md
 ```
 
@@ -79,15 +82,52 @@ SecureDesk/
 - CRUD modules stay inside feature folders so the code is easy to follow
 - Shared UI pieces live under `src/components`
 
+## Deployment
+
+### Vercel frontend
+
+Create a Vercel project with `Frontend` as the root directory.
+
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+- Environment variable: `VITE_API_BASE_URL=https://your-render-service.onrender.com/api`
+
+`Frontend/vercel.json` includes a rewrite to `index.html` so React Router routes such as `/login` and `/register` keep working after deployment.
+
+### Render backend
+
+The repo includes a Render Blueprint in `render.yaml` for the Express API.
+
+Recommended steps:
+
+1. Create a new Web Service on Render from this repository.
+2. Use the Blueprint or point the service root directory to `Backend`.
+3. Set the required environment variables:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `FRONTEND_URL`
+   - `SUPER_ADMIN_EMAIL`
+   - `SUPER_ADMIN_PASSWORD`
+4. Optionally set:
+   - `FRONTEND_URL_PATTERNS`
+   - `ADMIN_SIGNUP_COUPON`
+   - `SUPER_ADMIN_SIGNUP_COUPON`
+   - `SUPER_ADMIN_NAME`
+   - `SUPER_ADMIN_PHONE`
+
+Use `FRONTEND_URL` for your primary Vercel production URL or custom domain. If you also want preview deployments to reach the API, set `FRONTEND_URL_PATTERNS` to a wildcard pattern that matches your Vercel preview URLs, for example `https://securedesk-*.vercel.app`.
+
 ## Setup
 
 ### 1. Backend env
 
-Copy `Backend/.env.example` to `Backend/.env` and update the values. `FRONTEND_URL` should point to your Vite frontend origin, and it can be comma-separated if you want to allow more than one local dev URL.
+Copy `Backend/.env.example` to `Backend/.env` and update the values. `FRONTEND_URL` should point to your main frontend origin, and `FRONTEND_URL_PATTERNS` can be used for wildcard preview domains such as Vercel preview URLs.
 
 ### 2. Frontend env
 
-Copy `Frontend/.env.example` to `Frontend/.env`.
+Copy `Frontend/.env.example` to `Frontend/.env`. For production on Vercel, set `VITE_API_BASE_URL` to your Render backend URL plus `/api`.
 
 ### 3. Install dependencies
 
