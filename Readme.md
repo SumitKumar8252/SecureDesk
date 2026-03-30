@@ -5,7 +5,7 @@ SecureDesk is a role-based dashboard application with a separate Express MVC bac
 ## Stack
 
 - `Backend/`: Express, MongoDB, Mongoose, JWT, bcrypt, MVC structure
-- `Frontend/`: Vite, React `.jsx`, React Router, Redux Toolkit
+- `Frontend/`: Vite, React `.jsx`, Tailwind CSS v4, React Router, Redux Toolkit
 
 ## Features
 
@@ -17,6 +17,9 @@ SecureDesk is a role-based dashboard application with a separate Express MVC bac
 - Super Admin CRUD for Users under any Admin
 - Admin CRUD for only their own Users
 - User dashboard with task CRUD
+- Public signup with role selection
+- Secret coupon checks for admin and super admin self-signup
+- Glassmorphism UI with Tailwind CSS on the frontend
 - Frontend route protection with React Router guards
 - API protection with backend JWT and RBAC middleware
 - Search and pagination for listings
@@ -51,6 +54,7 @@ SecureDesk/
 │       ├── middleware/
 │       ├── models/
 │       ├── routes/
+│       ├── seeds/
 │       └── utils/
 ├── Frontend/
 │   ├── src/
@@ -62,7 +66,7 @@ SecureDesk/
 │   │   ├── styles/
 │   │   └── utils/
 │   ├── index.html
-│   └── vite.config.js
+│   └── vite.config.mjs
 └── README.md
 ```
 
@@ -70,6 +74,8 @@ SecureDesk/
 
 - Redux Toolkit is used for auth and session restoration
 - React Router handles route protection by role
+- Tailwind CSS v4 is loaded through `src/styles/index.css`
+- The Vite Tailwind plugin is configured in `Frontend/vite.config.mjs`
 - CRUD modules stay inside feature folders so the code is easy to follow
 - Shared UI pieces live under `src/components`
 
@@ -122,10 +128,24 @@ Default example credentials from the env template:
 - Email: `superadmin@example.com`
 - Password: `SuperAdmin123`
 
+## Registration coupons
+
+Privileged self-signup coupons live in `Backend/src/seeds/registrationCoupons.js`.
+
+- `user` signup does not need a coupon
+- `admin` signup requires the admin coupon
+- `super-admin` signup requires the super admin coupon
+
+You can edit the seeded defaults in that file, or override them with:
+
+- `ADMIN_SIGNUP_COUPON`
+- `SUPER_ADMIN_SIGNUP_COUPON`
+
 ## API summary
 
 ### Auth
 
+- `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 
@@ -157,5 +177,3 @@ Default example credentials from the env template:
 - Tasks belong only to logged-in users
 - Backend access is enforced with JWT auth middleware and role checks
 - Frontend access is enforced with protected React Router routes and Redux session restore
-
-
